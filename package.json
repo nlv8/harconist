@@ -18,8 +18,16 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onCommand:harconist.reload"
   ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "harconist.reload",
+        "title": "Harconist: Reload the typings of the available Harcon entities."
+      }
+    ]
+  },
   "keywords": [],
   "author": "Attila Bagossy",
   "license": "Apache-2.0",
@@ -36,6 +44,7 @@
     "tslint": "^5.16.0"
   },
   "dependencies": {
+    "fast-glob": "^2.2.7",
     "typescript": "^3.4.5"
   }
 }
