@@ -1,8 +1,9 @@
 'use strict';
 
-import * as vscode from 'vscode'
-import * as discovery from './discovery';
 import * as path from 'path';
+import * as vscode from 'vscode'
+
+import * as discovery from './discovery';
 
 
 export function activate(context: vscode.ExtensionContext) {
