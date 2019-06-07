@@ -1,9 +1,10 @@
 {
   "name": "harconist",
   "displayName": "harconist",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Harcon extension for Visual Studio Code.",
   "main": "./out/extension.js",
+  "publisher": "battila7",
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc  -p ./",
@@ -32,7 +33,7 @@
             },
             "uniqueItems": true,
             "default": [],
-            "markdownDescription": "Root folders in which Harconist will search for Harcon entities.\n\nHarconist will open the following directories in all root folders:\n  * `src\/bus`,\n  *  `bus` if `src\/bus` does not exists,\n  *  the former directories in all direct child directories.",
+            "markdownDescription": "Root folders in which Harconist will search for Harcon entities.\n\nHarconist will open the following directories in all root folders:\n  * `src/bus`,\n  *  `bus` if `src/bus` does not exists,\n  *  the former directories in all direct child directories.",
             "scope": "resource"
           },
           "harconist.hideLifecycleFunctions": {
@@ -69,7 +70,8 @@
     "@types/node": "^10.12.18",
     "@types/vscode": "^1.32.0",
     "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "vsce": "^1.62.0"
   },
   "dependencies": {
     "jsdoc-api": "^5.0.1"
