@@ -8,7 +8,7 @@ async function exists(p: string): Promise<boolean> {
     return new Promise(resolve => fs.exists(p, resolve));
 };
 
-const LIFETIME_FUNCTION_NAMES = [
+const LIFECYCLE_FUNCTION_NAMES = [
     'init', 'close'
 ];
 
@@ -48,7 +48,7 @@ export interface Entity {
 };
 
 export interface ProcessorOptions {
-    dropLifetimeFunctions?: boolean;
+    dropLifecycleFunctions?: boolean;
     dropUnderscoreFunctions?: boolean;
 };
 
@@ -173,8 +173,8 @@ export async function processEntity(entityPath: string, options: ProcessorOption
 
     const functions = getMemberFunctionElementsOf(elements, entityElement)
         .filter(element => {
-            if (options.dropLifetimeFunctions) {
-                return !LIFETIME_FUNCTION_NAMES.includes(element.name);
+            if (options.dropLifecycleFunctions) {
+                return !LIFECYCLE_FUNCTION_NAMES.includes(element.name);
             }
 
             return true;

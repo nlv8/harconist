@@ -21,6 +21,33 @@
     "onCommand:harconist.reload"
   ],
   "contributes": {
+    "configuration": [
+      {
+        "title": "Harconist",
+        "properties": {
+          "harconist.rootFolders": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "default": [],
+            "markdownDescription": "Root folders in which Harconist will search for Harcon entities.\n\nHarconist will open the following directories in all root folders:\n  * `src\/bus`,\n  *  `bus` if `src\/bus` does not exists,\n  *  the former directories in all direct child directories.",
+            "scope": "resource"
+          },
+          "harconist.hideLifecycleFunctions": {
+            "type": "boolean",
+            "default": "true",
+            "markdownDescription": "Whether Harcon lifecycle functions should be hidden or not."
+          },
+          "harconist.hideUnderscoreFunctions": {
+            "type": "boolean",
+            "default": "true",
+            "markdownDescription": "Whether functions whose name starts with an `_`  should be hidden or not."
+          }
+        }
+      }
+    ],
     "commands": [
       {
         "command": "harconist.reload",

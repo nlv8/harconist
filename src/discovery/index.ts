@@ -76,6 +76,10 @@ async function discoverBaseDirectory(baseDirectory: string): Promise<string[]> {
         .reduce((acc, curr) => acc.concat(curr), []);
 };
 
+function unique<T>(arr: Array<T>): Array<T> {
+    return [...(new Set<T>(arr)).values()];
+};
+
 export function getEntityPaths(): string[] {
     return [...entityPaths];
 };
@@ -83,5 +87,5 @@ export function getEntityPaths(): string[] {
 export async function discoverEntityPaths(baseDirectories: string[]): Promise<void> {
     const arrs = await Promise.all(baseDirectories.map(discoverBaseDirectory))
 
-    entityPaths = arrs.reduce((acc, curr) => acc.concat(curr), []);
+    entityPaths = unique(arrs.reduce((acc, curr) => acc.concat(curr), []));
 };

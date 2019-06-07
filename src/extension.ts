@@ -1,6 +1,5 @@
 'use strict';
 
-import * as path from 'path';
 import * as vscode from 'vscode'
 
 import * as discovery from './discovery';
@@ -12,12 +11,23 @@ interface EntityMap {
 
 let entities: EntityMap = {}
 
+function getPropertyOrDefault<T>(property: string, defaultValue: T): T {
+    return vscode.workspace.getConfiguration().has(property)
+        ? <T>vscode.workspace.getConfiguration().get(property)
+        : defaultValue;
+};
+
 async function reloadEntities(baseDirectories: string[]): Promise<void> {
     await discovery.discoverEntityPaths(baseDirectories);
 
     const paths = discovery.getEntityPaths()
 
-    const entityArray = (await Promise.all(paths.map(p => processor.processEntity(p))))
+    const opts: processor.ProcessorOptions = {
+        dropLifecycleFunctions: getPropertyOrDefault('harconist.dropLifecycleFunctions', true),
+        dropUnderscoreFunctions: getPropertyOrDefault('harconist.dropUnderscoreFunctions', true)
+    };
+
+    const entityArray = (await Promise.all(paths.map(p => processor.processEntity(p, opts))))
         .filter(p => p != null)
 
     const entityObject: EntityMap = {};
@@ -58,15 +68,26 @@ function makeFunctionDocumentation(f: processor.Function): vscode.MarkdownString
 };
 
 export function activate(context: vscode.ExtensionContext) {
-    const base = path.resolve(__dirname, '..', '..');
-
     const command = vscode.commands.registerCommand('harconist.reload', () => {
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'Reloading Harcon entities.',
             cancellable: false
         }, async () => {
-            await reloadEntities([base]);
+            // Don't touch that mouse
+            const anyad = <Array<string>>(vscode.workspace.getConfiguration().get('harconist.rootFolders') || [])
+
+            let folders = anyad;
+
+            if (vscode.workspace.workspaceFolders) {  
+                const workspaceFolders = vscode.workspace.workspaceFolders
+                    .filter(w => "file" == w.uri.scheme)
+                    .map(w => w.uri.fsPath);
+
+                folders = folders.concat(workspaceFolders);
+            }
+
+            await reloadEntities(folders);
         });
     });
 
