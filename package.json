@@ -41,10 +41,10 @@
   "devDependencies": {
     "@types/node": "^10.12.18",
     "@types/vscode": "^1.32.0",
-    "tslint": "^5.16.0"
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
   },
   "dependencies": {
-    "fast-glob": "^2.2.7",
-    "typescript": "^3.4.5"
+    "jsdoc-api": "^5.0.1"
   }
 }
