@@ -62,3 +62,9 @@ typings/
 
 # TS Output directory
 out/
+
+# Webpack Output directory
+dist/
+
+# Extension files
+*.vsix
