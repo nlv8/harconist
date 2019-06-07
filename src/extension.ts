@@ -28,7 +28,7 @@ async function reloadEntities(baseDirectories: string[]): Promise<void> {
     };
 
     const entityArray = (await Promise.all(paths.map(p => processor.processEntity(p, opts))))
-        .filter(p => p != null)
+        .filter(p => p != null);
 
     const entityObject: EntityMap = {};
 
