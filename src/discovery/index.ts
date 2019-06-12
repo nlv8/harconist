@@ -88,9 +88,15 @@ export async function discoverEntityPaths(baseDirectories: string[]): Promise<vo
     const arrs = [];
 
     for (const d of baseDirectories) {
-        const arr = await discoverBaseDirectory(d);
+        try {
+            const arr = await discoverBaseDirectory(d);
 
-        arrs.push(arr);
+            arrs.push(arr);
+        } catch (e) {
+            console.log('Harconist: could not discover base directory.');
+            console.log(d);
+            console.log(e);
+        }
     }
 
     entityPaths = unique(arrs.reduce((acc, curr) => acc.concat(curr), []));
