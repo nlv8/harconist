@@ -85,7 +85,13 @@ export function getEntityPaths(): string[] {
 };
 
 export async function discoverEntityPaths(baseDirectories: string[]): Promise<void> {
-    const arrs = await Promise.all(baseDirectories.map(discoverBaseDirectory))
+    const arrs = [];
+
+    for (const d of baseDirectories) {
+        const arr = await discoverBaseDirectory(d);
+
+        arrs.push(arr);
+    }
 
     entityPaths = unique(arrs.reduce((acc, curr) => acc.concat(curr), []));
 
