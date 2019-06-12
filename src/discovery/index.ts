@@ -88,4 +88,7 @@ export async function discoverEntityPaths(baseDirectories: string[]): Promise<vo
     const arrs = await Promise.all(baseDirectories.map(discoverBaseDirectory))
 
     entityPaths = unique(arrs.reduce((acc, curr) => acc.concat(curr), []));
+
+    console.log('Harconist detected the following entities.');
+    console.log(entityPaths);
 };

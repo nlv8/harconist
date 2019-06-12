@@ -143,6 +143,9 @@ function elementToFunction(path: string, element: any): Function {
 };
 
 export async function processEntity(entityPath: string, options: ProcessorOptions = {}): Promise<Entity | null> {
+    console.log('Harconist: processing entity');
+    console.log(entityPath);
+
     const elements = await parseElements(entityPath);
 
     const entityDirectory = path.dirname(entityPath);

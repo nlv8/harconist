@@ -27,8 +27,20 @@ async function reloadEntities(baseDirectories: string[]): Promise<void> {
         dropUnderscoreFunctions: getPropertyOrDefault('harconist.dropUnderscoreFunctions', true)
     };
 
-    const entityArray = (await Promise.all(paths.map(p => processor.processEntity(p, opts))))
-        .filter(p => p != null);
+    const entityArray = [];
+
+    for (const p of paths) {
+        try {
+            const entity = await processor.processEntity(p, opts);
+
+            if (entity != null) {
+                entityArray.push(entity);
+            }
+        } catch (e) {
+            console.log('Harconist: could not process the following entity.');
+            console.log(p);
+        }
+    }
 
     const entityObject: EntityMap = {};
 
@@ -86,6 +98,9 @@ export function activate(context: vscode.ExtensionContext) {
 
                 folders = folders.concat(workspaceFolders);
             }
+
+            console.log('Harconist will search in the following folders.');
+            console.log(folders);
 
             await reloadEntities(folders);
         });
