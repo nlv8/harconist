@@ -4,7 +4,7 @@
   "version": "0.3.0",
   "description": "Harcon extension for Visual Studio Code.",
   "main": "./out/extension.js",
-  "publisher": "battila7",
+  "publisher": "nlv8",
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
