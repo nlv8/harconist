@@ -52,7 +52,7 @@
     "commands": [
       {
         "command": "harconist.reload",
-        "title": "Harconist: Reload the typings of the available Harcon entities."
+        "title": "Harconist: Reload the available Harcon entities."
       }
     ]
   },
