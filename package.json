@@ -19,7 +19,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:harconist.reload"
+    "onCommand:harconist.reload",
+    "onCommand:harconist.incrementalLoad"
   ],
   "contributes": {
     "configuration": [
@@ -52,7 +53,11 @@
     "commands": [
       {
         "command": "harconist.reload",
-        "title": "Harconist: Reload the available Harcon entities."
+        "title": "Harconist: Reload available Harcon entities."
+      },
+      {
+        "command": "harconist.incrementalLoad",
+        "title": "Harconist: Incrementally load new Harcon entities."
       }
     ]
   },

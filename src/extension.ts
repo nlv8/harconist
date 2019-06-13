@@ -17,11 +17,7 @@ function getPropertyOrDefault<T>(property: string, defaultValue: T): T {
         : defaultValue;
 };
 
-async function reloadEntities(baseDirectories: string[]): Promise<void> {
-    await discovery.discoverEntityPaths(baseDirectories);
-
-    const paths = discovery.getEntityPaths()
-
+async function loadEntitiesFromPaths(paths: Array<string>) {
     const opts: processor.ProcessorOptions = {
         dropLifecycleFunctions: getPropertyOrDefault('harconist.dropLifecycleFunctions', true),
         dropUnderscoreFunctions: getPropertyOrDefault('harconist.dropUnderscoreFunctions', true)
@@ -42,15 +38,57 @@ async function reloadEntities(baseDirectories: string[]): Promise<void> {
         }
     }
 
+    return entityArray;
+};
+
+async function reloadEntities(baseDirectories: string[]): Promise<void> {
+    await discovery.discoverEntityPaths(baseDirectories);
+
+    const paths = discovery.getEntityPaths()
+
     const entityObject: EntityMap = {};
 
-    entityArray.forEach((entity: any) => {
-        entityObject[entity.name] = entity;
-    });
+    (await loadEntitiesFromPaths(paths))
+        .forEach((entity: any) => {
+            entityObject[entity.name] = entity;
+        });
 
     entities = entityObject;
 
-    vscode.window.showInformationMessage(`Harconist: ${Object.keys(entities).length} entities found.`);
+    vscode.window.showInformationMessage(`Harconist: Reloaded ${Object.keys(entities).length} entities.`);
+};
+
+function isEntityNotLoadedYet(p: string) {
+    return !Object.values(entities)
+        .some(e => e.location.path == p);
+};
+
+async function incrementallyLoadEntities(baseDirectories: string[]): Promise<void> {
+    await discovery.discoverEntityPaths(baseDirectories);
+
+    const paths = discovery.getEntityPaths()
+    
+    const freshPaths = paths
+        .filter(isEntityNotLoadedYet);
+
+    const entityObject: EntityMap = {};
+
+    Object.values(entities)
+        .filter(e => paths.includes(e.location.path))
+        .forEach(e => entityObject[e.name] = e);
+
+    const unloadCount = Object.keys(entities).length - Object.keys(entityObject).length;
+
+    const freshEntities = await loadEntitiesFromPaths(freshPaths)
+
+    const loadCount = freshEntities.length;
+
+    freshEntities
+        .forEach(e => entityObject[e.name] = e);
+
+    entities = entityObject;
+
+    vscode.window.showInformationMessage(`Harconist: Unloaded ${unloadCount} entities and loaded ${loadCount} entities.`);
 };
 
 function makeFunctionDocumentation(f: processor.Function): vscode.MarkdownString {
@@ -79,30 +117,47 @@ function makeFunctionDocumentation(f: processor.Function): vscode.MarkdownString
     return new vscode.MarkdownString(str);
 };
 
+function getEntityFolders() {
+    // Don't touch that mouse
+    const anyad = <Array<string>>(vscode.workspace.getConfiguration().get('harconist.rootFolders') || [])
+
+    let folders = anyad;
+
+    if (vscode.workspace.workspaceFolders) {  
+        const workspaceFolders = vscode.workspace.workspaceFolders
+            .filter(w => "file" == w.uri.scheme)
+            .map(w => w.uri.fsPath);
+
+        folders = folders.concat(workspaceFolders);
+    }
+
+    console.log('Harconist will search in the following folders.');
+    console.log(folders);
+
+    return folders;
+};
+
 export function activate(context: vscode.ExtensionContext) {
-    const command = vscode.commands.registerCommand('harconist.reload', () => {
+    const reloadCommand = vscode.commands.registerCommand('harconist.reload', () => {
         vscode.window.withProgress({
             location: vscode.ProgressLocation.Notification,
             title: 'Reloading Harcon entities.',
             cancellable: false
         }, async () => {
-            // Don't touch that mouse
-            const anyad = <Array<string>>(vscode.workspace.getConfiguration().get('harconist.rootFolders') || [])
-
-            let folders = anyad;
-
-            if (vscode.workspace.workspaceFolders) {  
-                const workspaceFolders = vscode.workspace.workspaceFolders
-                    .filter(w => "file" == w.uri.scheme)
-                    .map(w => w.uri.fsPath);
-
-                folders = folders.concat(workspaceFolders);
-            }
-
-            console.log('Harconist will search in the following folders.');
-            console.log(folders);
+            const folders = getEntityFolders();
 
             await reloadEntities(folders);
+        });
+    });
+
+    const incrementalLoadCommand = vscode.commands.registerCommand('harconist.incrementalLoad', () => {        vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: 'Discovering new Harcon entities.',
+            cancellable: false
+        }, async () => {
+            const folders = getEntityFolders();
+
+            await incrementallyLoadEntities(folders);
         });
     });
 
@@ -224,7 +279,7 @@ export function activate(context: vscode.ExtensionContext) {
         )
     )
 
-    context.subscriptions.push(command, entityProvider, methodProvider, linkProvider);
+    context.subscriptions.push(reloadCommand, incrementalLoadCommand, entityProvider, methodProvider, linkProvider);
 };
 
 export function deactive() {
